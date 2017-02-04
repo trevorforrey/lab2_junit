@@ -35,18 +35,22 @@ public class CheckingTest {
 
 	@Test
 	public void testWithdrawBasedOnAmount() {
+		
+		//Withdraw should only work on amounts > 0
+		
 		assertFalse(accountServer.getAccount("CheckingTest1").withdraw(-0.01f));
-		
 		assertFalse(accountServer.getAccount("CheckingTest1").withdraw(0.0f));
-		
 		assertTrue(accountServer.getAccount("CheckingTest1").withdraw(0.1f));
 	}
 	
 	@Test
 	public void testWithdrawBasedOnState() {
+		
+		// Test withdraw not available on closed account
 		accountServer.getAccount("CheckingTest1").setState(State.CLOSED);
 		assertFalse(accountServer.getAccount("CheckingTest1").withdraw(0.1f));
 		
+		// Test withdraw possible on open account
 		accountServer.getAccount("CheckingTest1").setState(State.OPEN);
 		assertTrue(accountServer.getAccount("CheckingTest1").withdraw(0.1f));
 	}
@@ -54,6 +58,9 @@ public class CheckingTest {
 	@Test
 	public void testWithdrawFree() {
 		
+		// withdrawal fee is taken out from account after 10th withdrawal
+		
+		// Withdraw 10 times
 		for (int i = 1; i <= 10; i++) {
 			accountServer.getAccount("CheckingTest1").withdraw(5.0f);
 		}
@@ -85,13 +92,18 @@ public class CheckingTest {
 	
 	@Test
 	public void testDepositAmountBasedOnAccountState() {
+		
+		// Deposits can not be made on closed accounts
 		accountServer.getAccount("CheckingTest1").setState(State.CLOSED);
 		assertFalse(accountServer.getAccount("CheckingTest1").deposit(100.0f));
 		
+		// After a deposit > 0, an account in OVERDRAWN state should change to
+		// the state of OPEN
 		accountServer.getAccount("CheckingTest1").setState(State.OVERDRAWN);
 		accountServer.getAccount("CheckingTest1").deposit(100.0f);
 		assertTrue(accountServer.getAccount("CheckingTest1").getState() == State.OPEN);
 		
+		// A deposit = 0 should not change an OVERDRAWN account to OPEN
 		accountServer.getAccount("CheckingTest1").setState(State.OVERDRAWN);
 		accountServer.getAccount("CheckingTest1").deposit(0.0f);
 		assertTrue(accountServer.getAccount("CheckingTest1").getState() == State.OVERDRAWN);
@@ -99,6 +111,9 @@ public class CheckingTest {
 	
 	@Test
 	public void testDepositAmountBasedOnAmountDeposited() {
+		
+		// Only deposits > 0 are valid
+		
 		assertFalse(accountServer.getAccount("CheckingTest1").deposit(-1.0f));
 		assertFalse(accountServer.getAccount("CheckingTest1").deposit(0.0f));
 		assertTrue(accountServer.getAccount("CheckingTest1").deposit(0.1f));
