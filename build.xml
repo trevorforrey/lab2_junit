@@ -1,0 +1,59 @@
+<project name="CST316JUnitLab15" default="build" basedir=".">
+	<property name="src" value="src" />
+	<property name="jars" value="jars"/>
+	<property name="build" value="build" />
+	<property name="junit4.jar" value="jars/junit-4.10.jar"/>
+	<property name="jar" value="LabJUnit.jar" />
+    <property name="build.junitreport.dir" value="${build}/junitreport"/>
+	
+	<path id="compile.classpath">
+            <pathelement path="${build}/classes"/>  
+            <fileset dir="${jars}">
+               <include name="**/*.jar"/>
+            </fileset>          
+    </path>
+    
+	<target name="prepare">
+		<tstamp/>
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="prepare">
+		<mkdir dir="${build}/classes" />
+		<javac classpath="${junit4.jar}" srcdir="${src}" destdir="${build}/classes" />
+	</target>
+
+	<target name="build" depends="compile">
+		<copy todir="${build}" file="my.properties"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete file="${jar}" />
+		<delete file="jacoco.exec"/>
+	</target>
+	
+    <target name="junit" depends="build"
+                       description="Runs JUnit tests for classes starts with Test, and generates a report.">
+               <!-- First, clean the junit directory. -->
+               <delete dir="${build.junitreport.dir}"/>
+               <mkdir dir="${build.junitreport.dir}"/> 
+               <!-- Run the tests -->
+               <echo message="JUnit testing is running..."/>
+               <junit printsummary="withOutAndErr" haltonfailure="no" fork="on">      
+                       <classpath>  
+                               <path refid="compile.classpath"/>
+                       </classpath>
+                       <formatter type="plain"/>
+                       <batchtest todir="${build.junitreport.dir}">
+                               <fileset dir="${src}">
+                                       <include name="**/*Test.java"/>
+                               </fileset>
+                       </batchtest>
+               </junit>
+               <echo message="JUnit results in ${build.junitreport.dir}"/>
+    </target>
+</project>
+	
+
+

@@ -1,0 +1,83 @@
+<project name="CST316JUnitLab15" default="build" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
+	<property name="src" value="src" />
+	<property name="jars" value="jars"/>
+	<property name="build" value="build" />
+	<property name="junit4.jar" value="jars/junit-4.10.jar"/>
+	<property name="jacocoant.jar" value="jars/jacocoant.jar"/>
+	<property name="build.junitreport.dir" value="${build}/junitreport"/>
+	<property name="build.jacocoreport.dir" value="${build}/jacocoreport"/>
+	<property name="jar" value="LabJUnit.jar" />
+	
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    	<classpath path="${jacocoant.jar}"/>
+    </taskdef>
+    
+	<path id="compile.classpath">
+            <pathelement path="${build}/classes"/>  
+            <fileset dir="${jars}">
+               <include name="**/*.jar"/>
+            </fileset>          
+    </path>
+    
+	<target name="prepare">
+		<tstamp/>
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="prepare">
+		<mkdir dir="${build}/classes" />
+		<javac classpath="${junit4.jar}" srcdir="${src}" destdir="${build}/classes" />
+	</target>
+
+	<target name="build" depends="compile">
+		<copy todir="${build}" file="my.properties"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete file="${jar}" />
+		<delete file="jacoco.exec"/>
+	</target>
+	
+    <target name="junit" depends="build"
+                       description="Runs JUnit tests for classes starts with Test, and generates a report.">
+               <!-- First, clean the junit directory. -->
+               <delete dir="${build.junitreport.dir}"/>
+               <mkdir dir="${build.junitreport.dir}"/> 
+               <!-- Run the tests -->
+               <echo message="JUnit testing is running..."/>
+         <jacoco:coverage>
+               <junit printsummary="withOutAndErr" haltonfailure="no" fork="on">      
+                       <classpath>  
+                               <path refid="compile.classpath"/>
+                       </classpath>
+                       <formatter type="plain"/>
+                       <batchtest todir="${build.junitreport.dir}">
+                               <fileset dir="${src}">
+                                       <include name="**/*Test.java"/>
+                               </fileset>
+                       </batchtest>
+               </junit>
+          </jacoco:coverage>
+               <jacoco:report>
+                       <executiondata>
+                          	<file file="jacoco.exec"/>
+                       </executiondata>
+                       <structure name="CST316 Example">
+                            <classfiles>
+                               <fileset dir="${build}/classes"/>
+                            </classfiles>
+                            <sourcefiles encoding="UTF-8">
+                               <fileset dir="src"/>
+                            </sourcefiles>
+                       </structure>
+                       <html destdir="${build.jacocoreport.dir}"/>
+                       <xml destfile="${build.jacocoreport.dir}/jacoco.xml"/>
+                       <csv destfile="${build.jacocoreport.dir}/jacoco.csv"/>
+               </jacoco:report>
+               <echo message="JUnit results in ${build.junitreport.dir}"/>
+    </target>
+</project>
+	
+
+
