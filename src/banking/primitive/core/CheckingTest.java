@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sun.java.swing.plaf.gtk.GTKConstants.StateType;
+//import com.sun.java.swing.plaf.gtk.GTKConstants.StateType;
 
 import banking.primitive.core.Account.State;
 
