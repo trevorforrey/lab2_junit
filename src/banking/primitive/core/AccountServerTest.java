@@ -2,11 +2,14 @@ package banking.primitive.core;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import banking.primitive.core.Account.State;
 
 public class AccountServerTest {
 	private static AccountServer accountServer = null;
@@ -92,5 +95,51 @@ public class AccountServerTest {
 		assertNull(accountServer.getAccount("CheckingGetTest2"));
 		assertNull(accountServer.getAccount("Checking GetTest"));
 		assertNull(accountServer.getAccount("checkinggettest"));
+	}
+	
+	// SER316 Task 2 Step 3 Part d
+	// 
+	
+	@Test
+	public void testcloseAccount() {
+		accountServer.newAccount("Checking", "CheckingCloseTest", 100.0f);
+		
+		// Test successful closing of account
+		assertTrue(accountServer.closeAccount("CheckingCloseTest"));
+		assertTrue(accountServer.getAccount("CheckingCloseTest").getState() == State.CLOSED);
+		
+		// Test closing of NE account
+		assertFalse(accountServer.closeAccount("NotExistentAccount"));
+		
+	}
+	
+	@Test
+	public void testGetActiveAccounts() {
+		
+		// Create accounts and set their state to closed
+		accountServer.newAccount("Checking", "ClosedAccount1", 100.0f);
+		accountServer.newAccount("Checking", "ClosedAccount2", 100.0f);
+		accountServer.newAccount("Checking", "ClosedAccount3", 100.0f);
+		
+		accountServer.getAccount("ClosedAccount1").setState(State.CLOSED);
+		accountServer.getAccount("ClosedAccount2").setState(State.CLOSED);
+		accountServer.getAccount("ClosedAccount3").setState(State.CLOSED);
+		
+		List<Account> result = accountServer.getActiveAccounts();
+		
+		// For every active account retrieved, check there is one of the closed accounts as well as if there
+		// are any closed accounts inside active account array list
+		for (int i = 0; i < result.size(); i++) {
+			assertTrue(result.get(i) != accountServer.getAccount("ClosedAccount1"));
+			assertTrue(result.get(i) != accountServer.getAccount("ClosedAccount2"));
+			assertTrue(result.get(i) != accountServer.getAccount("ClosedAccount3"));
+			assertFalse(result.get(i).getState() == State.CLOSED);
+		}
+	}
+	
+	@Test
+	public void testSaveAccounts() throws IOException {
+		// Test proper saving of accounts
+		assertTrue(accountServer.saveAccounts());
 	}
 }
