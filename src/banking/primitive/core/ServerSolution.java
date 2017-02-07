@@ -108,7 +108,7 @@ class ServerSolution implements AccountServer {
 	}
 	
 	public boolean saveAccounts() throws IOException {
-		boolean wasFailure = false;
+		boolean wasSuccessful = false;
 		ObjectOutputStream out = null; 
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(fileName));
@@ -118,7 +118,7 @@ class ServerSolution implements AccountServer {
 			{
 				out.writeObject(accountMap.get(i));
 			}
-			wasFailure = true;
+			wasSuccessful = true;
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -135,7 +135,7 @@ class ServerSolution implements AccountServer {
 					t.printStackTrace();
 				}
 			}
-			return wasFailure;
+			return wasSuccessful;
 		}
 	}
 
