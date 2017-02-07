@@ -27,6 +27,11 @@ public class CheckingTest {
 	@Before
 	public void setUp() throws Exception {
 		accountServer.newAccount("Checking", "CheckingTest1", 100.0f);
+		accountServer.newAccount("Checking", "CheckingTest2", 100.0f);
+		accountServer.newAccount("Checking", "CheckingTest3", 100.0f);
+		accountServer.newAccount("Checking", "CheckingTest4", 100.0f);
+		accountServer.newAccount("Checking", "CheckingTest5", 100.0f);
+		accountServer.newAccount("Checking", "CheckingTest6", 100.0f);
 	}
 
 	@After
@@ -47,12 +52,12 @@ public class CheckingTest {
 	public void testWithdrawBasedOnState() {
 		
 		// Test withdraw not available on closed account
-		accountServer.getAccount("CheckingTest1").setState(State.CLOSED);
-		assertFalse(accountServer.getAccount("CheckingTest1").withdraw(0.1f));
+		accountServer.getAccount("CheckingTest2").setState(State.CLOSED);
+		assertFalse(accountServer.getAccount("CheckingTest2").withdraw(0.1f));
 		
 		// Test withdraw possible on open account
-		accountServer.getAccount("CheckingTest1").setState(State.OPEN);
-		assertTrue(accountServer.getAccount("CheckingTest1").withdraw(0.1f));
+		accountServer.getAccount("CheckingTest2").setState(State.OPEN);
+		assertTrue(accountServer.getAccount("CheckingTest2").withdraw(0.1f));
 	}
 	
 	@Test
@@ -62,15 +67,15 @@ public class CheckingTest {
 		
 		// Withdraw 10 times
 		for (int i = 1; i <= 10; i++) {
-			accountServer.getAccount("CheckingTest1").withdraw(5.0f);
+			accountServer.getAccount("CheckingTest3").withdraw(5.0f);
 		}
 		
 		// check no additional withdraw fee after 10 withdraws
-		assertTrue(accountServer.getAccount("CheckingTest1").getBalance() == (100 - 50));
+		assertTrue(accountServer.getAccount("CheckingTest3").getBalance() == (100 - 50));
 		
 		// Should trigger 10th withdraw fee
-		accountServer.getAccount("CheckingTest1").withdraw(5.0f);
-		assertTrue(accountServer.getAccount("CheckingTest1").getBalance() == (100 - 50) - 5 - 2);
+		accountServer.getAccount("CheckingTest3").withdraw(5.0f);
+		assertTrue(accountServer.getAccount("CheckingTest3").getBalance() == (100 - 50) - 5 - 2);
 		
 	}
 	
@@ -78,15 +83,15 @@ public class CheckingTest {
 	public void testWithdrawOverDrawnState() {
 		
 		// Remaining Balance is 0, should not be OVERDRAWN
-		accountServer.getAccount("CheckingTest1").withdraw(100.0f);
-		assertFalse(accountServer.getAccount("CheckingTest1").getState() == State.OVERDRAWN);
+		accountServer.getAccount("CheckingTest4").withdraw(100.0f);
+		assertFalse(accountServer.getAccount("CheckingTest4").getState() == State.OVERDRAWN);
 		
 		// Reset Balance Back to 100
-		accountServer.getAccount("CheckingTest1").deposit(100.0f);
+		accountServer.getAccount("CheckingTest4").deposit(100.0f);
 		
 		// Take out more than current balance, state should be OVERDRAWN
-		accountServer.getAccount("CheckingTest1").withdraw(101.0f);
-		assertTrue(accountServer.getAccount("CheckingTest1").getState() == State.OVERDRAWN);
+		accountServer.getAccount("CheckingTest4").withdraw(101.0f);
+		assertTrue(accountServer.getAccount("CheckingTest4").getState() == State.OVERDRAWN);
 
 	}
 	
@@ -94,19 +99,19 @@ public class CheckingTest {
 	public void testDepositAmountBasedOnAccountState() {
 		
 		// Deposits can not be made on closed accounts
-		accountServer.getAccount("CheckingTest1").setState(State.CLOSED);
-		assertFalse(accountServer.getAccount("CheckingTest1").deposit(100.0f));
+		accountServer.getAccount("CheckingTest5").setState(State.CLOSED);
+		assertFalse(accountServer.getAccount("CheckingTest5").deposit(100.0f));
 		
 		// After a deposit > 0, an account in OVERDRAWN state should change to
 		// the state of OPEN
-		accountServer.getAccount("CheckingTest1").setState(State.OVERDRAWN);
-		accountServer.getAccount("CheckingTest1").deposit(100.0f);
-		assertTrue(accountServer.getAccount("CheckingTest1").getState() == State.OPEN);
+		accountServer.getAccount("CheckingTest5").setState(State.OVERDRAWN);
+		accountServer.getAccount("CheckingTest5").deposit(100.0f);
+		assertTrue(accountServer.getAccount("CheckingTest5").getState() == State.OPEN);
 		
 		// A deposit = 0 should not change an OVERDRAWN account to OPEN
-		accountServer.getAccount("CheckingTest1").setState(State.OVERDRAWN);
-		accountServer.getAccount("CheckingTest1").deposit(0.0f);
-		assertTrue(accountServer.getAccount("CheckingTest1").getState() == State.OVERDRAWN);
+		accountServer.getAccount("CheckingTest5").setState(State.OVERDRAWN);
+		accountServer.getAccount("CheckingTest5").deposit(0.0f);
+		assertTrue(accountServer.getAccount("CheckingTest5").getState() == State.OVERDRAWN);
 	}
 	
 	@Test
@@ -114,10 +119,10 @@ public class CheckingTest {
 		
 		// Only deposits > 0 are valid
 		
-		assertFalse(accountServer.getAccount("CheckingTest1").deposit(-1.0f));
-		assertFalse(accountServer.getAccount("CheckingTest1").deposit(0.0f));
-		assertTrue(accountServer.getAccount("CheckingTest1").deposit(0.1f));
-		assertTrue(accountServer.getAccount("CheckingTest1").getState() == State.OPEN);
+		assertFalse(accountServer.getAccount("CheckingTest6").deposit(-1.0f));
+		assertFalse(accountServer.getAccount("CheckingTest6").deposit(0.0f));
+		assertTrue(accountServer.getAccount("CheckingTest6").deposit(0.1f));
+		assertTrue(accountServer.getAccount("CheckingTest6").getState() == State.OPEN);
 	}
 
 }
