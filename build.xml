@@ -33,7 +33,7 @@
 		<delete file="jacoco.exec"/>
 	</target>
 	
-    <target name="junit" depends="build"
+    <target name="test" depends="build"
                        description="Runs JUnit tests for classes starts with Test, and generates a report.">
                <!-- First, clean the junit directory. -->
                <delete dir="${build.junitreport.dir}"/>
